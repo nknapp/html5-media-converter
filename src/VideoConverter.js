@@ -19,22 +19,32 @@ function VideoConverter(options) {
 
     this.toStream = function (size) {
         return ps.factory(false, !options.streamEncoding, function (input, output, callback) {
-            _this.convert(input,size,output,callback);
+            _this.convert(input, size, output, callback);
         });
     };
 
     this.convert = function (input, size, output, callback) {
-        var outputTmpFile = typeof(output)==="string";
-        var ffm = ffmpeg(input).outputOptions(options.args).size(size).output(output);
+        var outputTmpFile = typeof(output) === "string";
+
+        var ffm = ffmpeg(input).outputOptions(options.args);
+        var match;
+        if (match = size.match(/(\d+)x(\d+)/)) {
+            ffm.addOutputOptions("-vf", scale(match[1], match[2]));
+        } else {
+            ffm.size(size);
+        }
+        ffm.output(output);
+
         ffm.on('progress', function (progress) {
             console.log('Processing: ' + progress.percent + '% done');
         });
-        ffm.on("error", function(error,stdout,stderr) {
+        ffm.on("error", function (error, stdout, stderr) {
             error.stderr = stderr;
             callback(error);
         });
+
         if (outputTmpFile) {
-            ffm.on("end", function() {
+            ffm.on("end", function () {
                 callback();
             });
         }
@@ -43,6 +53,17 @@ function VideoConverter(options) {
             callback();
         }
     }
+}
+
+/**
+ * Compute ffmpeg parameter for scaling to fit box
+ * (see http://stackoverflow.com/questions/8133242/ffmpeg-resize-down-larger-video-to-fit-desired-size-and-add-padding)
+ * @param width
+ * @param height
+ * @returns {string}
+ */
+function scale(width, height) {
+    return "scale=iw*min(" + width + "/iw\\," + height + "/ih):ih*min(" + width + "/iw\\," + height + "/ih)";
 }
 
 /**
