@@ -4,6 +4,7 @@ var path = require("path");
 
 var source = path.resolve(__dirname, "../testdata/video.mp4");
 var unstreamableSource = path.resolve(__dirname, "../testdata/unstreamableVideo.mp4");
+var errorSource = path.resolve(__dirname, "../testdata/novideo.mp4");
 var targetDir = path.resolve(__dirname, "../tmp");
 require("long-stack-traces");
 
@@ -40,7 +41,7 @@ exports.testMp4 = function (test) {
 
 exports.testFfmpegError = function (test) {
     var converter = VideoConverter.defaults.mp4;
-    var readStream = fs.createReadStream(unstreamableSource);
+    var readStream = fs.createReadStream(errorSource);
     var ffmpegStream = converter.toStream("200x200");
     var outStream = fs.createWriteStream(path.join(targetDir, "targetError" + converter.extName()));
     readStream.on("error",console.log).pipe(ffmpegStream).on("error",function() {

@@ -18,15 +18,20 @@ function VideoConverter(options) {
     };
 
     this.toStream = function (size) {
-        return ps.factory(false, !options.streamEncoding, function (input, output, callback) {
+        var factory = ps.factory(false, !options.streamEncoding, function (input, output, callback) {
             _this.convert(input, size, output, callback);
         });
+        factory.videoConverter = this;
+        return factory;
     };
 
     this.convert = function (input, size, output, callback) {
         var outputTmpFile = typeof(output) === "string";
 
         var ffm = ffmpeg(input).outputOptions(options.args);
+        ffm.on('start', function(commandLine) {
+            console.log('Spawned Ffmpeg with command: ' + commandLine);
+        });
         var match;
         if (match = size.match(/(\d+)x(\d+)/)) {
             ffm.addOutputOptions("-vf", scale(match[1], match[2]));

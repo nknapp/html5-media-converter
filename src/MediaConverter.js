@@ -1,7 +1,8 @@
 var _ = require("underscore");
 var path = require("path");
 var Q = require("q");
-var VideoConverter  = require("./VideoConverter.js");
+var VideoConverter = require("./VideoConverter.js");
+var Stream = require('stream');
 
 
 /**
@@ -39,13 +40,35 @@ function MediaConverter(options) {
             var converter = VideoConverter.defaults[format];
             if (converter) {
                 var target = path.join(targetDir, path.basename(source).replace(/\..*?$/, converter.extName()));
-                converter.convert(source,size,target, defer.makeNodeResolver());
+                converter.convert(source, size, target, defer.makeNodeResolver());
                 return defer.promise;
             } else {
                 throw new Error("Could not find ffmpeg config for format '" + format * "'");
             }
         }));
+    };
+
+    /**
+     * Returns map
+     * @param size
+     * @returns {Stream.Passthrough}
+     */
+    this.asStream = function(size) {
+        var input = new Stream.PassThrough();
+        var outputs = options.videoFormats.map(function(format) {
+            var output = VideoConverter.defaults[format].toStream(size);
+            input.pipe(output);
+            return output
+        });
+        input.map = function(callback) {
+            outputs.map(function(stream) {
+                callback.call(stream,stream);
+            });
+        };
+        return input;
     }
+
 }
+
 
 module.exports = MediaConverter;
