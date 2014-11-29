@@ -18,7 +18,7 @@ function VideoConverter(options) {
     };
 
     this.toStream = function (size) {
-        var factory = ps.factory(false, !options.streamEncoding, function (input, output, callback) {
+        var factory = ps.factory(false, !options.streamEncoding, function (err, input, output, callback) {
             _this.convert(input, size, output, callback);
         });
         factory.videoConverter = this;

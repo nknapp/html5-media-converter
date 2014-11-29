@@ -1,2 +1,3 @@
-# Created by .gitignore support plugin (hsz.mobi)
 html5-media-converter.iml
+tmp
+node_modules

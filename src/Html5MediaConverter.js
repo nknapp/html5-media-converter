@@ -21,8 +21,7 @@ function MediaConverter(options) {
             // Path the the imagemagick convert program
             convert: 'convert'
         },
-        videoFormats: ['mp4', 'ogv', 'webm'],
-        simulate: false
+        videoFormats: ['mp4', 'ogv', 'webm']
     });
 
     /**
@@ -48,11 +47,6 @@ function MediaConverter(options) {
         }));
     };
 
-    /**
-     * Returns map
-     * @param size
-     * @returns {Stream.Passthrough}
-     */
     this.asStream = function(size) {
         var input = new Stream.PassThrough();
         var outputs = options.videoFormats.map(function(format) {

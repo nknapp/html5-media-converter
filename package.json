@@ -2,17 +2,20 @@
   "name": "html5-media-converter",
   "description": "Converts videos and images into web-usable formats",
   "version": "0.0.1",
-  "main": "src/html5-media-converter.js",
+  "main": "src/Html5MediaConverter.js",
   "dependencies": {
-    "child-process-promise": "^1.0.0",
     "fluent-ffmpeg": "^2.0.0-rc3",
-    "long-stack-traces": "^0.1.2",
     "process-streams": "^0.2.0",
     "q": "^1.1.2",
     "q-io": "^1.11.6",
     "underscore": "^1.7.0"
   },
+  "scripts": {
+    "test": "./node_modules/nodeunit/bin/nodeunit testsrc/"
+  },
   "devDependencies": {
+    "long-stack-traces": "^0.1.2",
     "nodeunit": "^0.9.0"
-  }
+  },
+  "author": "Nils Knappmeier <npm@knappi.org> (http://www.knappi.org)"
 }
