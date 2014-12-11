@@ -2,6 +2,8 @@ var path = require("path");
 var MediaConverter = require("../src/Html5MediaConverter.js");
 var mc = new MediaConverter();
 var fs = require("fs");
+var Q = require("q");
+require("q-debug-mode")(Q);
 
 var source = path.resolve(__dirname, "../testdata/video.mp4");
 

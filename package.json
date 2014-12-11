@@ -20,7 +20,8 @@
   },
   "devDependencies": {
     "long-stack-traces": "^0.1.2",
-    "nodeunit": "^0.9.0"
+    "nodeunit": "^0.9.0",
+    "q-debug-mode": "0.0.1"
   },
   "author": "Nils Knappmeier <npm@knappi.org> (http://www.knappi.org)"
 }
