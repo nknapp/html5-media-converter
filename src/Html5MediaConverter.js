@@ -47,6 +47,11 @@ function MediaConverter(options) {
         }));
     };
 
+    /**
+     * Create a stream that converts the files to the specified size in a web-usable format.
+     * @param size
+     * @returns {Stream.PassThrough}
+     */
     this.asStream = function(size) {
         var input = new Stream.PassThrough();
         var outputs = options.videoFormats.map(function(format) {
