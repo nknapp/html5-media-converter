@@ -1,8 +1,10 @@
 var _ = require("underscore");
 var path = require("path");
-var Q = require("q");
 var VideoConverter = require("./VideoConverter.js");
 var Stream = require('stream');
+var magic = require('stream-mmmagic');
+magic.config.magicFile = "(null),"+path.join(__dirname,"../misc/magic");
+var presets = require("./presets.js");
 
 
 /**
@@ -21,52 +23,39 @@ function MediaConverter(options) {
             // Path the the imagemagick convert program
             convert: 'convert'
         },
-        videoFormats: ['mp4', 'ogv', 'webm']
+        videoFormats: ['mp4', 'ogv', 'webm'],
+        imageFormats: ['jpeg']
     });
-
-    /**
-     * Converts a file to webm, mp4 and ogv and places those files in a specified directory.
-     * Files are scaled down to a specified size
-     * @param source
-     * @param size
-     * @param targetDir
-     * @returns {*}
-     */
-    this.convert = function (source, size, targetDir) {
-        console.log("Converting" + source);
-        return Q.allSettled(options.videoFormats.map(function (format) {
-            var defer = Q.defer();
-            var converter = VideoConverter.defaults[format];
-            if (converter) {
-                var target = path.join(targetDir, path.basename(source).replace(/\..*?$/, converter.extName()));
-                converter.convert(source, size, target, defer.makeNodeResolver());
-                return defer.promise;
-            } else {
-                throw new Error("Could not find ffmpeg config for format '" + format * "'");
-            }
-        }));
-    };
+    VideoConverter.setFfmpegPath(options.programs.ffmpeg);
 
     /**
      * Create a stream that converts the files to the specified size in a web-usable format.
      * @param size
      * @returns {Stream.PassThrough}
      */
-    this.asStream = function(size) {
+    this.thumbs = function(size) {
         var input = new Stream.PassThrough();
-        var outputs = options.videoFormats.map(function(format) {
-            var output = VideoConverter.defaults[format].toStream(size);
-            input.pipe(output);
-            return output
-        });
-        input.map = function(callback) {
-            outputs.map(function(stream) {
-                callback.call(stream,stream);
-            });
+        var storedCallback = null;
+        input.forEach = function(callback) {
+            storedCallback = callback;
         };
+        magic(input,function(err,mimeType,stream) {
+            presets.convertersFor(mimeType.type).forEach(function(converter) {
+                stream.converter = converter;
+                stream.pipe(converter.toStream(size));
+                storedCallback.call(stream,stream);
+            });
+        });
         return input;
-    }
+    };
 
+    /**
+     * Convert a video to an mp4 container without re-encoding.
+     * @returns {converters.mp4_copy|*}
+     */
+    this.mp4Copy = function() {
+        return presets.converters.mp4_copy.toStream();
+    }
 }
 
 

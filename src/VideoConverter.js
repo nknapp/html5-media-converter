@@ -7,58 +7,76 @@ var ps = new ProcessStreams();
  * @param options.streamEncoding {Boolean}
  * @param options.args {Array.<String>}
  * @param options.ext {String}
+ * @param options.name {String} a name for the converter
  * @constructor
  */
 function VideoConverter(options) {
 
     var _this = this;
 
+    this.name = function() {
+        return options.name;
+    };
+
     this.extName = function () {
         return options.ext;
     };
 
+    /**
+     * Generate a stream from the video converter
+     * @param size
+     * @returns {*}
+     */
     this.toStream = function (size) {
         var factory = ps.factory(false, !options.streamEncoding, function (input, output, callback) {
-            _this.convert(input, size, output, callback);
+            var stream = this;
+            var ffm = _this.convert(input, size, output, callback);
+            ['start','progress','error'].forEach(function(event) {
+                ffm.on(event, function() {
+                    stream.emit.apply(stream,[event].concat(arguments));
+                });
+            });
         });
         factory.videoConverter = this;
         return factory;
     };
 
     this.convert = function (input, size, output, callback) {
-        var outputTmpFile = typeof(output) === "string";
-
         var ffm = ffmpeg(input).outputOptions(options.args);
         ffm.on('start', function(commandLine) {
             console.log('Spawned Ffmpeg with command: ' + commandLine);
         });
-        var match;
-        if (match = size.match(/(\d+)x(\d+)/)) {
-            ffm.addOutputOptions("-vf", scale(match[1], match[2]));
-        } else {
-            ffm.size(size);
+        if (size) {
+            var match = size.match(/(\d+)x(\d+)/);
+            if (match) {
+                ffm.addOutputOptions("-vf", scale(match[1], match[2]));
+            } else {
+                throw new Error("Illegal size specification: "+size);
+            }
         }
         ffm.output(output);
-
-        ffm.on('progress', function (progress) {
-            console.log('Processing: ' + progress.percent + '% done');
-        });
         ffm.on("error", function (error, stdout, stderr) {
             error.stderr = stderr;
             callback(error);
         });
-
-        if (outputTmpFile) {
+        ffm.run();
+        if (typeof(output) === "string") {
+            // If 'output' is a file, the callback must be called after ffmpeg has finished (only then is the file ready)
             ffm.on("end", function () {
                 callback();
             });
-        }
-        ffm.run();
-        if (!outputTmpFile) {
+        } else {
             callback();
         }
+        return ffm;
     }
 }
+
+/**
+ * @function
+ * @param ffmpegPath {string}
+ */
+VideoConverter.setFfmpegPath = ffmpeg.setFfmpegPath;
 
 /**
  * Compute ffmpeg parameter for scaling to fit box
@@ -78,20 +96,3 @@ function scale(width, height) {
  **/
 
 module.exports = VideoConverter;
-module.exports.defaults = {
-    mp4: new VideoConverter({
-        streamEncoding: false,
-        args: ['-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'baseline', '-preset', 'fast', '-crf', '18', '-f', 'mp4'],
-        ext: '.mp4'
-    }),
-    webm: new VideoConverter({
-        streamEncoding: true,
-        args: ['-c:v', 'libvpx', '-pix_fmt', 'yuv420p', '-c:a', 'libvorbis', '-quality', 'good', '-b:v', '2M', '-crf', '5', '-f', 'webm'],
-        ext: '.webm'
-    }),
-    ogv: new VideoConverter({
-        streamEncoding: true,
-        args: ['-c:v', 'libtheora', '-pix_fmt', 'yuv420p', '-c:a', 'libvorbis', '-q', '5', '-f', 'ogg'],
-        ext: '.ogv'
-    })
-};

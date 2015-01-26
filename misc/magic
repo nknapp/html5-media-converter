@@ -1,0 +1,7 @@
+4 byte 0x47
+>5 beshort 0x4000
+>>7 byte ^0xF
+>>>196 byte 0x47
+>>>>388 byte 0x47
+>>>>>580 byte 0x47 M2TS MPEG transport stream, v2
+!:mime video/mp2t

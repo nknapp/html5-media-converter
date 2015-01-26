@@ -9,10 +9,14 @@
     "url": "git://github.com/nknapp/html5-media-converter.git"
   },
   "dependencies": {
+    "event-stream": "^3.1.7",
+    "exiftool": "0.0.3",
     "fluent-ffmpeg": "^2.0.0-rc3",
-    "process-streams": "^0.3.1",
+    "imagemagick-stream": "^1.1.0",
+    "process-streams": "*",
     "q": "^1.1.2",
     "q-io": "^1.11.6",
+    "stream-mmmagic": "0.3.0",
     "underscore": "^1.7.0"
   },
   "scripts": {
