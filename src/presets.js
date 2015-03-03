@@ -4,7 +4,7 @@ var ImageConverter = require("./ImageConverter.js");
 var converters = {
     mp4: new VideoConverter({
         streamEncoding: false,
-        args: ['-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'baseline', '-preset', 'fast', '-crf', '18', '-f', 'mp4'],
+        args: ['-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'baseline', '-preset', 'fast', '-crf', '18', '-f', 'mp4','-movflags','faststart'],
         ext: '.mp4',
         name: 'mp4'
     }),
@@ -22,7 +22,7 @@ var converters = {
     }),
     mp4_copy: new VideoConverter({
         streamEncoding: false,
-        args: ['-c:v', 'copy', '-c:a', 'copy','-f','mp4'],
+        args: ['-c:v', 'copy', '-c:a', 'copy','-f','mp4', '-movflags','faststart'],
         ext: '.mp4',
         name: 'mp4_copy'
     }),
