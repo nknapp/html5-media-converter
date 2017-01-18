@@ -12,11 +12,11 @@
     "event-stream": "^3.1.7",
     "exiftool": "0.0.3",
     "fluent-ffmpeg": "^2.0.0-rc3",
-    "imagemagick-stream": "^1.1.0",
+    "imagemagick-stream": "^4.1.1",
     "process-streams": "^1.0.0",
     "q": "^1.1.2",
     "q-io": "^1.11.6",
-    "stream-mmmagic": "0.3.0",
+    "stream-mmmagic": "1.1.0",
     "underscore": "^1.7.0"
   },
   "scripts": {
@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "long-stack-traces": "^0.1.2",
-    "nodeunit": "^0.9.0",
+    "nodeunit": "^0.10.2",
     "q-debug-mode": "0.0.1",
     "video-testdata-loader": "^1.0.0"
   },
