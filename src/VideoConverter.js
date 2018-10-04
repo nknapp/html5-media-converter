@@ -86,7 +86,7 @@ VideoConverter.setFfmpegPath = ffmpeg.setFfmpegPath;
  * @returns {string}
  */
 function scale(width, height) {
-    return "scale=iw*min(" + width + "/iw\\," + height + "/ih):ih*min(" + width + "/iw\\," + height + "/ih)";
+    return "scale=\"iw*min(" + width + "/iw\\," + height + "/ih):ih*min(" + width + "/iw\\," + height + "/ih)\"";
 }
 
 /**
